@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Untuk Kamu</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        :root{
+            --primary: #d63384;
+            --bg1: linear-gradient(135deg, #ffcef5, #f8e8ff);
+            --card-radius: 22px;
+        }
+
+        *{box-sizing:border-box}
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "Poppins", sans-serif;
+            background: var(--bg1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .card {
+            background: white;
+            width: 92%;
+            max-width: 680px;
+            padding: 30px;
+            border-radius: var(--card-radius);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+            text-align: center;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%) translateY(0);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 450ms ease, transform 450ms cubic-bezier(.2,.9,.2,1);
+        }
+        .card.active{ opacity:1; pointer-events:auto; transform: translateX(-50%) translateY(0); }
+        .card.exit{ opacity:0; transform: translateX(-50%) translateY(-12px); pointer-events:none }
+
+        h1 { font-size: 28px; font-weight: 600; color: var(--primary); margin-bottom: 12px; }
+        p { font-size: 16px; color: #444; line-height:1.6; margin: 0 0 18px 0 }
+
+        .btn-wrap{ margin-top: 20px }
+        button{ padding: 10px 18px; font-size:15px; border:none; border-radius:10px; background:var(--primary); color:#fff; cursor:pointer }
+        button.ghost{ background: transparent; color:var(--primary); border:1px solid rgba(214,51,132,.12) }
+
+        /* Signature */
+        .signature-box{ display:flex; justify-content:space-between; gap:12px; margin-top:28px }
+        .sig{ width:48% }
+        .sig-line{ margin-top:46px; border-bottom:2px solid #777; width:100% }
+        .sig-name{ margin-top:10px; color:#555 }
+
+        /* Images */
+        .photo-row{ display:flex; gap:12px; justify-content:center; margin:14px 0 }
+        .photo{ width:45%; height:160px; border-radius:14px; background-size:cover; background-position:center; box-shadow: 0 8px 22px rgba(0,0,0,0.08) }
+
+        /* Hearts */
+        .heart{ position:fixed; top:-20px; font-size:20px; color:#ff4da6; opacity:.9; animation: fall linear infinite }
+        @keyframes fall{ 0%{transform:translateY(-20px)} 100%{transform:translateY(110vh)} }
+
+        /* Modal */
+        .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; visibility:hidden; opacity:0; transition:opacity 220ms }
+        .modal-backdrop.show{ visibility:visible; opacity:1 }
+        .modal{ background:white; padding:22px; border-radius:14px; width:90%; max-width:420px; text-align:center; box-shadow:0 12px 30px rgba(0,0,0,.2) }
+        .modal h2{ margin:0 0 8px 0; color:var(--primary) }
+
+        /* Final / reject styles */
+        .fun{ font-weight:600 }
+        .small{ font-size:14px; color:#666 }
+
+        /* Music control */
+        .music-control{ position:fixed; right:18px; top:18px; background:rgba(255,255,255,.9); padding:8px 10px; border-radius:999px; box-shadow:0 8px 20px rgba(0,0,0,.08); display:flex; gap:8px; align-items:center }
+
+        @media (max-width:520px){ .photo{ height:110px } .signature-box{ flex-direction:column; gap:12px } }
+    </style>
+</head>
+<body>
+
+    <!-- MUSIC -->
+    <audio id="bgm" loop>
+        <!-- Ganti link musik di sini bila mau -->
+        <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_6b2c1e55af.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="music-control" id="musicControl">
+        <button id="playBtn">Play</button>
+        <button id="pauseBtn" class="ghost">Pause</button>
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="card active" id="step1">
+        <h1>Ada sesuatu yang HARUS kamu tau, Jeng Jeng</h1>
+        <p>Aku mau, kamu baca ini pelan-pelan ya. Pegangan Ya. Siap?WKWK</p>
+        <div class="btn-wrap"><button onclick="goTo(2)">Buka Surat</button></div>
+    </div>
+
+    <!-- STEP 2: surat with photos -->
+    <div class="card" id="step2">
+        <h1>Surat Pernyataan Untuk Kamu Sal</h1>
+        <p>Intinya, AKU SUKAAAAAAAA SAMAAAAAA KAMUUUUU. Ini sedikit pesan dari isi hatiku. Kalau Perasaan aku banyak buat kamu. WKWK</p>
+        <div class="btn-wrap"><button onclick="goTo(3)">Lihat selanjutnya ya</button></div>
+    </div>
+
+    <!-- STEP 3: sign -->
+    <div class="card" id="step3">
+        <h1>Dengan ini, Surat Pernyataan ini dibuat dengan sadar dan terbayang bayang cantikmu.</h1>
+        <p>Aku menyatakan perasaan ini tulus.</p>
+
+        <div class="btn-wrap"><button onclick="openConfirm()">Kasih Jawaban Kamu Ya❤</button></div>
+    </div>
+
+    <!-- STEP 4: final choice (shown after confirm yes) -->
+    <div class="card" id="step4">
+        <h1>Terima kasih sudah membaca ❤</h1>
+        <p>Aku cuma mau kamu tau. Tujuan aku deketin kamu.</p>
+        <div class="btn-wrap"><button onclick="openConfirm(true)">Jadi Gimana ni hubungan kita?</button></div>
+    </div>
+
+    <!-- FINAL SCREEN (AFTER YES) -->
+    <div class="card" id="step5">
+        <h1>Yeay!! ❤</h1>
+        <p class="fun">Aku seneng banget jadi pacar kamu... makasih ya :))</p>
+    </div>
+
+    <!-- REJECT / NO MODE -->
+    <div class="card" id="reject">
+        <h1>Owhyauda deh kita jalanin seperti biasanya aja</h1>
+        <p class="small">GAPAPA KOK :)</p>
+    </div>
+
+    <!-- Modal confirm -->
+    <div class="modal-backdrop" id="modal">
+        <div class="modal">
+            <h2>Kamu yakin?</h2>
+            <p class="small">Jawabanmu akan mencerminkan perasaanmu saat ini. Pilih dengan jujur ya 😊</p>
+            <div style="margin-top:14px; display:flex; gap:10px; justify-content:center;">
+                <button id="modalYes">Yakin</button>
+                <button id="modalNo" class="ghost">Belum</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    // --- Page navigation with fade ---
+    const pages = ['step1','step2','step3','step4','step5','reject'];
+    let current = 0;
+
+    function goTo(index){
+        // 🔥 NYALAIN MUSIK SETIAP ADA KLIK
+        bgm.play().catch(()=>{});
+
+        if(typeof index === 'number'){
+            switchTo(index-1);
+            return;
+        }
+        const id = index;
+        const idx = pages.indexOf(id);
+        if(idx!==-1) switchTo(idx);
+    }
+
+    function switchTo(idx){
+        const prev = document.getElementById(pages[current]);
+        const next = document.getElementById(pages[idx]);
+        if(prev) { prev.classList.remove('active'); prev.classList.add('exit'); }
+        setTimeout(()=>{ if(prev) prev.classList.remove('exit') }, 450);
+        if(next){ next.classList.add('active'); }
+        current = idx;
+    }
+
+    // --- Modal ---
+    const modal = document.getElementById('modal');
+    const modalYes = document.getElementById('modalYes');
+    const modalNo = document.getElementById('modalNo');
+
+    function openConfirm(isFromFinal=false){
+    modal.classList.add('show');
+
+    // 🔥 musik start
+    bgm.play().catch(()=>{});
+
+    modalYes.onclick = ()=>{
+        modal.classList.remove('show');
+
+        // pindah halaman dulu
+        switchTo(pages.indexOf('step5'));
+
+        // 🔥 Setelah 1,2 detik, otomatis kirim pesan ke WhatsApp
+        setTimeout(()=>{
+            window.location.href = "https://wa.me/089509616245?text=Aku%20terima%20kamu%20jadi%20pacar%20aku❤️";
+        }, 1200);
+    };
+
+    modalNo.onclick = ()=>{
+        modal.classList.remove('show');
+        switchTo(pages.indexOf('reject'));
+    };
+}
+    // --- Hearts generator ---
+    function createHeart(){
+        const heart = document.createElement('div');
+        heart.classList.add('heart');
+        heart.innerHTML = '❤';
+        heart.style.left = Math.random() * window.innerWidth + 'px';
+        heart.style.fontSize = (12 + Math.random()*26) + 'px';
+        heart.style.animationDuration = (3 + Math.random()*4) + 's';
+        document.body.appendChild(heart);
+        setTimeout(()=> heart.remove(), 7000);
+    }
+    setInterval(createHeart, 420);
+
+    // --- Music control ---
+    const bgm = document.getElementById('bgm');
+    const playBtn = document.getElementById('playBtn');
+    const pauseBtn = document.getElementById('pauseBtn');
+
+    playBtn.onclick = ()=> bgm.play().catch(()=>{});
+    pauseBtn.onclick = ()=> bgm.pause();
+
+    // --- FIX FOTO (yang bikin error sebelumnya) ---
+    const photoA = 'https://images.unsplash.com/photo-1503023345310-bd7c1de61c7d?auto=format&fit=crop&w=800&q=60';
+    const photoB = 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=60';
+
+    document.getElementById('photoA').style.backgroundImage = `url('${photoA}')`;
+    document.getElementById('photoB').style.backgroundImage = `url('${photoB}')`;
+
+    // --- Start step1 ---
+    document.addEventListener('DOMContentLoaded', ()=>{
+        document.querySelectorAll('.card').forEach((c,i)=>{ if(i!==0) c.classList.remove('active'); });
+        document.getElementById('step1').classList.add('active');
+    });
+</script>
+</body>
+</html>
